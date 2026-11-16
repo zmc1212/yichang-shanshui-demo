@@ -65,3 +65,5 @@ jobs:
         uses: actions/deploy-pages@v4
 
 # Deployment trigger refresh after source token configuration.
+
+# R2.1 terrain relief update: rebuild from the latest private source branch.
