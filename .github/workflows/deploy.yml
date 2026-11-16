@@ -51,6 +51,8 @@ jobs:
         run: npm run check:dem
       - name: Build static site
         working-directory: source
+        env:
+          DEPLOY_BASE_PATH: /yichang-shanshui-demo/
         run: npm run build
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
