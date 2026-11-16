@@ -28,6 +28,7 @@ jobs:
         with:
           repository: zmc1212/yichang-shanshui-between
           ref: feat/procedural-city-foundation-r1
+          token: ${{ secrets.SOURCE_REPO_TOKEN }}
           path: source
       - name: Setup Python
         uses: actions/setup-python@v5
