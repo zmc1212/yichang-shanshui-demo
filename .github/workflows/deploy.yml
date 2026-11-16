@@ -1,0 +1,62 @@
+name: Build and deploy Yichang R2 demo
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: yichang-shanshui-demo-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout demo deployment config
+        uses: actions/checkout@v4
+      - name: Checkout private development source snapshot
+        uses: actions/checkout@v4
+        with:
+          repository: zmc1212/yichang-shanshui-between
+          ref: feat/procedural-city-foundation-r1
+          path: source
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate Yichang SRTM terrain
+        working-directory: source
+        run: python scripts/build-yichang-dem.py
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+      - name: Install dependencies
+        working-directory: source
+        run: npm ci
+      - name: Validate DEM integration
+        working-directory: source
+        run: npm run check:dem
+      - name: Build static site
+        working-directory: source
+        run: npm run build
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload built site only
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: source/dist
+      - name: Deploy public demo
+        id: deployment
+        uses: actions/deploy-pages@v4
